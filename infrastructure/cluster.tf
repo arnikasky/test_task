@@ -14,15 +14,16 @@ module "eks_cluster" {
   cluster_name    = var.cluster_name
   cluster_version = var.kubernetes_version
 
-  vpc_id     = var.vpc_id
-  subnet_ids = var.subnet_ids
+  vpc_id     = aws_vpc.main.id
+  subnet_ids = [for subnet in aws_subnet.aws_subnet : subnet.id]
 
   eks_managed_node_groups = {
     default_node_group = {
+      capacity_type  = "SPOT"
       instance_types = ["t3.medium"]
       min_size       = 1
-      max_size       = 3
-      desired_size   = 2
+      max_size       = 2
+      desired_size   = 1
     }
   }
 
@@ -31,6 +32,19 @@ module "eks_cluster" {
     ManagedBy   = "Terraform"
     GitOps      = "True"
   }
+  depends_on = [
+    aws_vpc.main,
+    aws_subnet.aws_subnet
+  ]
+}
+
+resource "null_resource" "kubectl_config" {
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --region eu-central-1 --name var.cluster.name"
+  }
+  depends_on = [
+    module.eks_cluster
+  ]
 }
 
 output "cluster_endpoint" {
