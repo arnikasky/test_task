@@ -15,7 +15,7 @@ module "eks_cluster" {
   cluster_version = var.kubernetes_version
 
   vpc_id     = aws_vpc.main.id
-  subnet_ids = [for subnet in aws_subnet.aws_subnet : subnet.id]
+  subnet_ids = [for subnet in aws_subnet.private : subnet.id]
 
   eks_managed_node_groups = {
     default_node_group = {
@@ -34,7 +34,7 @@ module "eks_cluster" {
   }
   depends_on = [
     aws_vpc.main,
-    aws_subnet.aws_subnet
+    aws_subnet.private
   ]
 }
 
