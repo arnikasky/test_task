@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v3
 name: test-app
 description: A minimal Helm chart for a simple web application.
 type: application
